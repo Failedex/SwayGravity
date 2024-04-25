@@ -3,6 +3,7 @@ from i3ipc import Rect, Event
 from i3ipc.aio import Connection
 import time
 import asyncio
+import subprocess
 
 GRAVITY = 2
 FRICTION = 0.92
@@ -12,6 +13,10 @@ SCREEN = Rect(dict(
     width = 1920,
     height = 1080
 ))
+
+async def sound(vx, vy): 
+    vol = min((max(abs(vy), abs(vx))), 400)/5
+    subprocess.Popen(["mpv", "--no-video", "./boing.mov", f"--volume={vol+40}"])
 
 class Window(Rect):
     def __init__(self, data, id): 
@@ -36,22 +41,30 @@ class Window(Rect):
         if pos.x < SCREEN.x and velocity[0] < 0: 
             await i3.command(f"[con_id={self.id}] move absolute position {SCREEN.x}px {pos.y}px")
             velocity[0] *= -1
+            await sound(velocity[0], velocity[1])
 
         if pos.x + pos.width > SCREEN.x+SCREEN.width and velocity[0] > 0: 
             await i3.command(f"[con_id={self.id}] move absolute position {SCREEN.x+SCREEN.width-pos.width}px {pos.y}px")
             velocity[0] *= -1
+            await sound(velocity[0], velocity[1])
 
         if pos.y < SCREEN.y and velocity[1] < 0: 
             await i3.command(f"[con_id={self.id}] move absolute position {pos.x}px {SCREEN.y}px")
+            self.pos.y = SCREEN.y
             velocity[1] = 0
 
         if pos.y+pos.height > SCREEN.y+SCREEN.height and velocity[1] > 0: 
             if abs(velocity[1]-GRAVITY) > 5:
-                # stop fucking moving
                 await i3.command(f"[con_id={self.id}] move absolute position {pos.x}px {SCREEN.y+SCREEN.height-pos.height+5}px")
-                self.pos.y = SCREEN.y+SCREEN.height-pos.height+5
 
-            velocity[1] = 0
+                # stop fucking moving
+                # self.pos.y = SCREEN.y+SCREEN.height-pos.height+5
+
+                velocity[1] *= 0.5
+                velocity[1] = int(velocity[1])
+                velocity[1] *= -1
+            else:
+                velocity[1] = 0
 
         if max(abs(velocity[0]), abs(velocity[1])) > 1:
             await i3.command(f"[con_id={self.id}] move absolute position {pos.x+velocity[0]}px {pos.y+velocity[1]}px")
