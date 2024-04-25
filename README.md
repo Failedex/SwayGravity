@@ -12,7 +12,8 @@ https://github.com/Failedex/sway-gravity/assets/92513573/5ca369a3-3f1b-46df-8a1c
 - mpv
 
 ## Usage 
-Just run the script
+1. Edit your screen size in the script (default is 1920x1080)
+2. Run the script
 ```
 ./gravity
 ```
