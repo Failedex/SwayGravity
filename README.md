@@ -4,6 +4,7 @@ A python script that adds gravity to floating windows, the windows can also be t
 ## Dependencies 
 - python3 
 - i3ipc python 
+- mpv
 
 ## Usage 
 Just run the script
