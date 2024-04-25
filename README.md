@@ -1,4 +1,4 @@
-# Gravity in i3
+# Gravity in sway
 A python script that adds gravity to floating windows, the windows can also be thrown. This was made for April Fools' Day
 
 ## Dependencies 
